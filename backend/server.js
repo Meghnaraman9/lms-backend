@@ -6,6 +6,16 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
 const app = express();
 
 // Security middleware
@@ -30,14 +40,23 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
+console.log('Loading auth route...');
 app.use('/api/auth', require('./routes/auth'));
+console.log('Loading courses route...');
 app.use('/api/courses', require('./routes/courses'));
+console.log('Loading users route...');
 app.use('/api/users', require('./routes/users'));
+console.log('Loading coding route...');
 app.use('/api/coding', require('./routes/coding'));
+console.log('Loading quiz route...');
 app.use('/api/quiz', require('./routes/quiz'));
+console.log('Loading ai route...');
 app.use('/api/ai', require('./routes/ai'));
+console.log('Loading certificates route...');
 app.use('/api/certificates', require('./routes/certificates'));
+console.log('Loading progress route...');
 app.use('/api/progress', require('./routes/progress'));
+console.log('✅ All routes loaded successfully');
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'LMS API Running' }));
