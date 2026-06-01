@@ -32,7 +32,18 @@ app.use('/api/', limiter);
 
 // CORS
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: function(origin, callback) {
+    const allowed = [
+      process.env.CLIENT_URL,
+      'http://localhost:3000'
+    ];
+    // Allow any vercel.app subdomain
+    if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
